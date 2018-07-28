@@ -1,0 +1,143 @@
+# Hadoop 环境搭建
+## centOS6.5环境准备
+### centOS hostname配置
+> 修改hostname：root权限下 `vi /etc/sysconfig/network` 修改HOSTNAME=自定义hostname 后重启机器生效
+> 配置hostname与本级ip映射
+> 查看本机hostname： `hostname` / `uname -n`
+
+### centOS 防火墙配置(需要关闭防火墙或添加服务端口,以免hadoop对外服务端口被拦截)
+> 查看防火墙状态(root权限下)：`service iptables status`
+> 停止防火墙(root权限下)    ：`service iptables stop`
+> 启动防火墙(root权限下)    : `service iptables start`
+> 重启防火墙(root权限下)    : `service iptables restart`
+> 永久关闭防火墙(root权限下): `chkconfig iptables off`
+> 永久关闭后启用(root权限下): `chkconfig iptables on`
+
+### centOS 静态IP地址配置
+> 配置ip地址：`sudo vi /etc/sysconfig/network-scripts/ifcfg-eth0`
+
+## JAVA环境配置
+> `vi ~/.bash_profile`
+> 追加
+	`export JAVA_HOME=/usr/java/jdk1.8.0_101/`
+	`export PATH=$JAVA_HOME/bin:$PATH`
+
+## Hadoop集群搭建
+### Hadoop环境变量配置
+> `vi ~/.bash_profile`
+> 追加
+	`export HADOOP_HOME=/home/lsh/hadoop-2.7.3`
+	`export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin::$PATH`
+### hadoop 伪分布式集群搭建
+> 配置JAVA_HOME(/etc/hadoop目录下):`vi hadoop-env.sh` 将`export JAVA_HOME=${JAVA_HOME}` 改为真是JAVA_HOME路径
+> 配置core-site.xml：`vi core-site.xml` 
+`<configuration>
+	<property> 
+		<name>fs.defaultFS</name>
+		<value>hdfs://iZm5eficl3p7xecy928ckhZ:9000</value>
+	</property> 
+	<property> 
+		<name>hadoop.tmp.dir</name>
+		<value>/opt/hadoopdata</value>
+	</property>
+	<property>
+   		 <name>hadoop.proxyuser.bigdata.hosts</name>
+    		 <value>*</value>
+  	</property>
+  	<property>
+    		<name>hadoop.proxyuser.bigdata.groups</name>
+    		<value>*</value>
+  	</property>
+</configuration>`
+> 配置hdfs-site.xml:`vi hdfs-site.xml`
+`<configuration>
+	<property> 
+		<name>dfs.replication</name> 
+		<value>1</value> 
+	</property>
+</configuration>`
+> 配置yarn-site.xml :`vi yarn-site.xml`
+`<configuration>
+	<property> 
+		<name>yarn.nodemanager.aux-services</name> 
+		<value>mapreduce_shuffle</value> 
+	</property> 
+	<property> 
+		<name>yarn.resourcemanager.address</name> 
+		<value>iZm5eficl3p7xecy928ckhZ:18040</value> 
+	</property> 
+	<property> 
+		<name>yarn.resourcemanager.scheduler.address</name> 
+		<value>iZm5eficl3p7xecy928ckhZ:18030</value> 
+	</property> 
+	<property> 
+		<name>yarn.resourcemanager.resource-tracker.address</name> 
+		<value>iZm5eficl3p7xecy928ckhZ:18025</value> 
+	</property> 
+	<property> 
+		<name>yarn.resourcemanager.admin.address</name> 
+		<value>iZm5eficl3p7xecy928ckhZ:18141</value> 
+	</property> 
+	<property> 
+		<name>yarn.resourcemanager.webapp.address</name> 
+		<value>iZm5eficl3p7xecy928ckhZ:18088</value> 
+	</property>
+	<property>
+		<name>yarn.resourcemanager.scheduler.class</name>
+		<value>org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler</value>
+	</property>
+</configuration>`
+> 配置mapred-site.xml:`vi mapred-site.xml`
+`<configuration>
+<property>
+     <name>mapreduce.framework.name</name>
+     <value>yarn</value>
+   </property>
+   <property>
+     <name>mapreduce.jobhistory.done-dir</name> 
+     <value>/user/history/done</value> 
+  </property> 
+  <property> 
+    <name>mapreduce.jobhistory.intermediate-done-dir</name> 
+    <value>/user/history/done_intermediate</value> 
+    </property>
+</configuration>`
+> 配置slaves：将本机hostname 追加到slaves文件内：`echo hostname > slaves` 或 修改此文件内容 `vi slaves`
+
+###启动与验证
+> 启动hdfs:`sbin/start-dfs.sh`
+> 验证：输入 `jps` 查看到namenode、datanode、SecondaryNameNode
+
+###注意问题
+1. 需要配置hosts 内外网Ip与hostname的映射
+2. 需要做ssh免密登录 
+
+## HBase
+> 配置JAVA_HOME(conf文件下):`vi hbase-env.sh` 去掉JAVA_HOME行前注释 路径修改为实际路径
+> 修改hbase-site.xml:`vi hbase-site.xml`
+`<configuration>
+<property>
+	<name>hbase.cluster.distributed</name>
+	<value>true</value>
+</property>
+<property>
+	<name>hbase.rootdir</name>
+	<value>hdfs://iZm5eficl3p7xecy928ckhZ:9000/hbase</value>
+</property>
+<property>
+	<name>hbase.zookeeper.quorum</name>
+	<value>iZm5eficl3p7xecy928ckhZ</value>
+</property>
+</configuration>`
+> 配置regionservers:`vi regionservers`:内容修改为本机hostname
+
+## zookeeper配置
+
+## Kafka配置
+
+
+
+## MySQL安装
+
+
+
