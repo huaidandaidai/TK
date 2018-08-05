@@ -1,0 +1,51 @@
+# postgresql使用教程
+## Ubuntu15 安装
+[参考连接1](http://www.ruanyifeng.com/blog/2013/12/getting_started_with_postgresql.html)
+[参考连接2](http://blog.csdn.net/tingyuanss/article/details/45197267)
+###### shell命令安装postgresql服务端
+`sudo apt-get install postgresql`
+###### shell命令安装postgresql链接工具
+`sudo apt-get install pgadmin3`
+## postgresql使用
+###### shell命令创建用户及数据库
+首先，创建数据库用户jira，并指定其为超级用户
+`sudo -u postgres createuser --superuser jira`
+然后，登录数据库控制台，设置dbuser用户的密码，完成后退出控制台。
+```
+sudo -u postgres psql
+\password dbuser
+\q
+
+```
+接着，在shell命令行下，创建数据库jiradb，并指定所有者为jira。
+`sudo -u postgres createdb -O jira jiradb`
+
+添加新用户和新数据库以后，就要以新用户的名义登录数据库，这时使用的是psql命令。
+
+`psql -U jira -d jiradb -h 127.0.0.1 -p 5432`
+
+上面命令的参数含义如下：-U指定用户，-d指定数据库，-h指定服务器，-p指定端口。
+
+输入上面命令以后，系统会提示输入dbuser用户的密码。输入正确，就可以登录控制台了
+
+###### postgresql服务启动与停止
+查看服务状态
+`/etc/init.d/postgresql status`
+启动服务
+`sudo service postgresql start`
+停止服务
+`sudo service postgresql stop`
+
+###### postgresql配置远程访问
+配置/etc/postgresql/9.3/main下
+1.postgresql.conf
+将该文件中的listen_addresses项值设定为“*”，在9.0 Windows版中，该项配置已经是“*”无需修改。
+
+2.pg_hba.conf
+在该配置文件的host all all 127.0.0.1/32 md5行下添加以下配置（表示允许网段192.168.1.0上的所有主机使用所有合法的数据库用户名访问数据库，并提供加密的密码验证。其中，数字24是子网掩码，表示允许192.168.1.0--192.168.1.255的计算机访问！）
+host  all    all    192.168.1.0/24    md5
+
+，或者直接将这一行修改为以下配置
+host    all    all    0.0.0.0/0    md5
+
+如果不希望允许所有IP远程访问，则可以将上述配置项中的0.0.0.0设定为特定的IP值
