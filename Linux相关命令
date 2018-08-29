@@ -129,3 +129,10 @@ libvirt：虚拟化服务
 >切换到root用户下：su root
 >运行：visudo
 >在打开的配置文件中，找到root ALL=(ALL) ALL一行，在其下面添加  XXX ALL=(ALL) ALL
+
+
+linux vi ctrl+b 网上回一页 
+	 set nu 行号
+   命令行 Ctrl+a 回到行首
+   0回到开头 $回到结尾
+小JJ 回到文件第一行
