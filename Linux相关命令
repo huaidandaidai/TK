@@ -1,0 +1,131 @@
+
+
+# Linux命令相关
+### Vim
+> [Ctrl]+[f]:屏幕向下移动一页，相当于[PageDown]按键
+  [Ctrl]+[b]:屏幕香山移动一页，相当于[PageUp]按键
+  0或者功能键[Home]:移动到这一行的最前面字符处。
+  $或者功能键[End]：移动到这一行的最后面字符处
+  G:移动到这个文件的最后一行
+  gg:移动到这个文件的第一行，相当于1G
+  N[Enter]：N为数字，光标向下移动N行
+### 文件操作
+> 批量删除特定前缀文件 ：rm -rf 2013* //centos下 删除以2013开头的所有文件
+
+### win下写的shell脚本 在linux无法执行
+> vi filename → :set ff 可以看到dos或unix的字样. 如果的确是dos格式的, 那么你可以用set ff=unix把它强制为unix格式的, 然后存盘退出. 再运行一遍看
+
+### ubuntu vi键盘数字键 方向键错误解决
+> apt-get remove vim-common
+> sudo apt-get install vim
+
+### ubuntu ssh连接
+```
+SSH分客户端openssh-client和openssh-server
+如果你只是想登陆别的机器的SSH只需要安装openssh-client（ubuntu有默认安装，如果没有则sudo apt-get install openssh-client），如果要使本机开放SSH服务就需要安装openssh-server
+sudo apt-get install openssh-server
+然后确认sshserver是否启动了：
+ps -e |grep ssh
+如果看到sshd那说明ssh-server已经启动了。
+如果没有则可以这样启动：sudo /etc/init.d/ssh start
+ssh-server配置文件位于/ etc/ssh/sshd_config，在这里可以定义SSH的服务端口，默认端口是22，你可以自己定义成其他端口号，如222。
+然后重启SSH服务：
+sudo /etc/init.d/ssh stop
+sudo /etc/init.d/ssh start
+```
+### ubuntu 主机名修改
+`sudo vi /etc/hostname`
+
+修改了Ubuntu里面的主机名，后面执行一些命令都出现一个提示
+
+sudo: unable to resolve host XXX
+
+这是机器在反解上的出现主机名不匹配
+
+
+解决方法：
+
+编辑/etc/hosts
+
+127.0.0.1 localhost
+127.0.1.1 原来的主机名#如果没有这一行 自行添加上去就行了
+
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+
+替换成新的主机名  保存 就可以了!
+
+#网络重启
+rhel6： /etc/init.d/network restart
+
+
+# 调优命令
+##### iostat 
+1、 yum install iostat*
+2、iostat -c （CPU） -d(磁盘) （-p sda(磁盘) -dk）
+3、iostat -x -d -m
+##### netstat -antup 
+-a 表示显示全部
+-n 拒绝显示别名
+-p 显示建立相关参数程序名
+
+
+# KVM 虚拟化
+### 查看CPU是否支持硬件虚拟化
+   Intel:cat /proc/cpuinfo |grep --color vmx
+   AMD  :cat /proc/cpuinfo |grep --color svm
+### 安装KVM模块、管理工具和libvirt服务
+> yum install kvm virt-manager libvirt -y
+virt-manager： KVM图形化管理工具
+libvirt：虚拟化服务
+
+#windows 系统只能安装在磁盘格式为GPT的
+> 在windows安装界面 按键SHIFT+F10 弹出命令行 
+ 依次输入：diskpart    
+ list disk  查看硬盘盘符
+ select disk 0  0是指你看到的及选择的硬盘盘符
+ clean  执行磁盘清理  清理成功后
+ conver gpt  转换为GPT格式
+ 
+# 用户环境变量与系统环境变量
+> ubuntu  /etc/environment  /etc/profile(全局)  ~/.bashrc(用户变量)
+> centos  /etc/environment /ect/profile(全局)  ~/.bash_profile(用户变量)
+
+# 查看服务状态
+> ubuntu :service xxxx(服务如mysql/ssh/nginx) status
+
+# Linux 下的MySql
+> 安装 apt-get install mysql-server(ubuntu) `http://blog.csdn.net/chenpy/article/details/50344085`
+> 登录  mysql -uroot -plsh(-u<用户名> -p<密码>) 或 mysql -u root -p 后输入密码(133虚拟机用户名密码root/lsh bigdata/bigdata)
+> 退出 quit/exit
+> 查看数据库
+
+# less、more、cat命令
+
+
+# linux 磁盘分区及挂在<http://man.linuxde.net/>
+> fdisk -l / parted -l 查看本机磁盘情况 需要root 权限
+> df -l 查看磁盘分区情况 
+> mount mount命令用于加载文件系统到指定的加载点。此命令的最常用于挂载cdrom，使我们可以访问cdrom中的数据，因为你将光盘插入cdrom中，Linux并不会自动挂载，必须使用Linux mount命令来手动完成挂载
+>unmount 取消挂载点
+
+# man命令
+`manual`的简称，查看帮助文档的命令
+
+#linux 关机命令
+> shutdown -h now `立刻关机`
+> shutdown -h 20:00 `系统会在今天20：00关机`
+> shutdown -h +10 `系统会在十分钟后关机`
+> shutdown -r now `系统立刻重启`
+> shutdown -r +30 'the system will reboot' `系统30分钟后重启，后面信息显示给其他用户用于提醒`
+
+# linux解决用户非root组用户问题(centos)
+>切换到root用户下：su root
+>运行：visudo
+>在打开的配置文件中，找到root ALL=(ALL) ALL一行，在其下面添加  XXX ALL=(ALL) ALL
